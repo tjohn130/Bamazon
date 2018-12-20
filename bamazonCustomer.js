@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 var inquirer = require("inquirer");
+require("dotenv").config();
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -11,8 +12,8 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "P@ssw0rd",
-  database: "Bamazon"
+  password: process.env.MYSQL_PW,
+  database: "bamazon"
 });
 
 connection.connect(function(err){
@@ -23,7 +24,7 @@ connection.connect(function(err){
 })
 
 function Display(){
-    var query = 'SELECT * FROM product';
+    var query = 'SELECT * FROM products';
     connection.query(query,function(err,res){
         res.forEach(element => {
             console.log(element.item_id);
@@ -36,9 +37,9 @@ function Display(){
     })
 }
 
-function Search(){
-    inquirer.prompt([
-        {name: 'prompt1',
-        type: 'input',
-        message: ''},{}])
-}
+// function Search(){
+//     inquirer.prompt([
+//         {name: 'prompt1',
+//         type: 'input',
+//         message: ''},{}])
+// }
