@@ -17,15 +17,15 @@ var connection = mysql.createConnection({
 });
 
 connection.connect(function(err){
+    //Running App
     if (err) throw err;
     console.log('The connection thread ID is :'+connection.threadId);
-    Display();
     Search();
 
 })
 
 function Display(){
-
+    //This function displays the The Database in an ordered list
     connection.query('SELECT * FROM products',function(err,res){
 
         res.forEach(element => {
@@ -35,12 +35,16 @@ function Display(){
             // console.log(element.price);
             // console.log(element.stock_quantity);
             console.log("\nItem ID:"+element.item_id+" Product Name:"+element.product_name+" Department Name:"+element.department_name+" Price:"+element.price+" Stock:"+element.stock_quantity);
-
-        });  
+        });
+        console.log("\n")  
     })
 }
 
 function Search(){
+//This Function runs a the 'Display' function and ask the user for input
+    Display();
+
+
     inquirer.prompt([
         {name: 'prompt1',
         type: 'input',
@@ -53,15 +57,19 @@ function Search(){
         }]).then(function(answer){
             connection.query('SELECT * FROM products WHERE ?',{item_id: answer.prompt1},function(err,res){
                 if (err) throw err;
-
+                //This takes the amount for the database and subtracts the requested amount
                 var remainder = res[0].stock_quantity - answer.prompt2;
 
-                console.log("Item ID:"+res[0].item_id+" Product Name:"+res[0].product_name+" Department Name:"+res[0].department_name+" Price:"+res[0].price+" Stock:"+res[0].stock_quantity);
-
-                if (remainder<0){
-                    console.log("Insufficient quantity!")
+                //Check if the amount if can be request due to space
+                if  (remainder < 0){
+                    //Disp
+                    connection.end(console.log("Insuffient quantity!"));
                 }
 
+                //Run if amount is accepted
+                else{
+
+                //The Update Query Search
                 connection.query('UPDATE products SET ? WHERE ?',
                 [
                     {stock_quantity: remainder},
@@ -69,8 +77,10 @@ function Search(){
                 ],
                 function(err,res){
                     if (err) throw err;
-                    connection.end(console.log("DONE"));
+                    //console.log(res)
+                    connection.end(console.log("Your Order has been Processed"));
                 })
+                }
             })
 
             
